@@ -4,10 +4,20 @@ import mk.ukim.finki.ecommerce.ecommercelab.model.domain.Author;
 import mk.ukim.finki.ecommerce.ecommercelab.model.domain.Book;
 import mk.ukim.finki.ecommerce.ecommercelab.model.dto.CreateBookDto;
 import mk.ukim.finki.ecommerce.ecommercelab.model.dto.DisplayBookDto;
+import mk.ukim.finki.ecommerce.ecommercelab.model.dto.DisplayBookExtendedDto;
+import mk.ukim.finki.ecommerce.ecommercelab.model.dto.DisplayBookShortDto;
+import mk.ukim.finki.ecommerce.ecommercelab.model.enums.BookCategory;
+import mk.ukim.finki.ecommerce.ecommercelab.model.enums.BookState;
 import mk.ukim.finki.ecommerce.ecommercelab.model.exceptions.AuthorNotFoundException;
 import mk.ukim.finki.ecommerce.ecommercelab.model.exceptions.BookNotFoundException;
+import mk.ukim.finki.ecommerce.ecommercelab.model.projection.BookShortProjection;
+import mk.ukim.finki.ecommerce.ecommercelab.model.views.BookCategoryStats;
+import mk.ukim.finki.ecommerce.ecommercelab.model.views.BookView;
+import mk.ukim.finki.ecommerce.ecommercelab.repository.BookRepository;
 import mk.ukim.finki.ecommerce.ecommercelab.service.domain.AuthorService;
 import mk.ukim.finki.ecommerce.ecommercelab.service.domain.BookService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +26,12 @@ import java.util.List;
 public class BookApplicationServiceImpl implements BookApplicationService{
     private final BookService bookService;
     private final AuthorService authorService;
+    private final BookRepository bookRepository;
 
-    public BookApplicationServiceImpl(BookService bookService, AuthorService authorService) {
+    public BookApplicationServiceImpl(BookService bookService, AuthorService authorService, BookRepository bookRepository) {
         this.bookService = bookService;
         this.authorService = authorService;
-    }
-
-    @Override
-    public List<DisplayBookDto> findAll() {
-        return bookService.findAll().stream().map(DisplayBookDto::from).toList();
+        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -58,5 +65,26 @@ public class BookApplicationServiceImpl implements BookApplicationService{
     @Override
     public DisplayBookDto rent(Long id) {
         return DisplayBookDto.from(bookService.rentBook(id));
+    }
+
+    @Override
+    public Page<BookShortProjection> findAllFiltered(BookCategory category, BookState state, Long authorId, boolean availableOnly, Pageable pageable) {
+        return bookRepository.findAllFiltered(category, state, authorId, availableOnly, pageable);
+    }
+
+
+    @Override
+    public List<DisplayBookExtendedDto> findAllExtended() {
+        return bookRepository.findAllExtendedProjectedBy().stream()
+                .map(p -> new DisplayBookExtendedDto(
+                        p.getId(),
+                        p.getName(),
+                        p.getCategory(),
+                        p.getState(),
+                        p.getAvailableCopies(),
+                        p.getAuthor().getName(),
+                        p.getAuthor().getSurname(),
+                        p.getAuthor().getCountry().getName()
+                )).toList();
     }
 }

@@ -5,9 +5,14 @@ import mk.ukim.finki.ecommerce.ecommercelab.model.domain.Author;
 import mk.ukim.finki.ecommerce.ecommercelab.model.domain.Book;
 import mk.ukim.finki.ecommerce.ecommercelab.model.enums.BookCategory;
 import mk.ukim.finki.ecommerce.ecommercelab.model.enums.BookState;
+import mk.ukim.finki.ecommerce.ecommercelab.model.events.BookRentedEvent;
 import mk.ukim.finki.ecommerce.ecommercelab.model.exceptions.BookNotAvailableException;
 import mk.ukim.finki.ecommerce.ecommercelab.model.exceptions.BookNotFoundException;
+import mk.ukim.finki.ecommerce.ecommercelab.model.projection.BookShortProjection;
 import mk.ukim.finki.ecommerce.ecommercelab.repository.BookRepository;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService{
     private final BookRepository bookRepository;
-
+    private final ApplicationEventPublisher eventPublisher;
     @Override
     public List<Book> findAll() {
         return bookRepository.findAll();
@@ -55,11 +60,12 @@ public class BookServiceImpl implements BookService{
     @Override
     public Book rentBook(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-
         if (book.getState() == BookState.BAD || book.getAvailableCopies() <= 0){
             throw new BookNotAvailableException(id);
         }
         book.setAvailableCopies(book.getAvailableCopies() - 1);
-        return bookRepository.save(book);
+        Book saved = bookRepository.save(book);
+        eventPublisher.publishEvent(new BookRentedEvent(this, saved));
+        return saved;
     }
 }
