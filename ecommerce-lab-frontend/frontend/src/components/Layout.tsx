@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Box, Stack } from '@mui/material';
 import { useAuth } from '../hooks/useAuth';
+import { formatRoleLabel } from '../utils/roles';
 
 export const Layout: React.FC = () => {
     const { isAuthenticated, role, username, logout } = useAuth();
@@ -36,7 +37,7 @@ export const Layout: React.FC = () => {
                         )}
                         {isAuthenticated && (
                             <>
-                                <Typography variant="body2" sx={{ ml: 1 }}>{username} ({role?.replace('ROLE_', '')})</Typography>
+                                <Typography variant="body2" sx={{ ml: 1 }}>{username} ({formatRoleLabel(role)})</Typography>
                                 <Button color="inherit" onClick={handleLogout}>Logout</Button>
                             </>
                         )}

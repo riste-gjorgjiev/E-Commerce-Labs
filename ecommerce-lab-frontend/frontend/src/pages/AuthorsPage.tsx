@@ -3,6 +3,7 @@ import { useAuthors } from '../hooks/useAuthors';
 import { useCountries } from '../hooks/useCountries';
 import { useAuth } from '../hooks/useAuth';
 import { EntityDialog } from '../components/EntityDialog';
+import { isAdminRole } from '../utils/roles';
 import {
     List,
     ListItem,
@@ -23,7 +24,7 @@ const AuthorsPage: React.FC = () => {
     const { authors, loading, error, createAuthor, updateAuthor, deleteAuthor } = useAuthors();
     const { countries } = useCountries();
     const { role } = useAuth();
-    const isAdmin = role === 'ROLE_ADMIN';
+    const isAdmin = isAdminRole(role);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formState, setFormState] = useState<AuthorPayload>({

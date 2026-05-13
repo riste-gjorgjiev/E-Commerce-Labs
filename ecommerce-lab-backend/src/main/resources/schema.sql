@@ -30,3 +30,9 @@ CREATE TABLE IF NOT EXISTS shop_users (
                                          password VARCHAR(255) NOT NULL,
                                          role     VARCHAR(50)  NOT NULL
     );
+
+CREATE TABLE IF NOT EXISTS user_preferences (
+                                                id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                                user_id         BIGINT NOT NULL UNIQUE REFERENCES shop_users(id),
+                                                books_view_mode VARCHAR(20) NOT NULL DEFAULT 'grid'
+    );

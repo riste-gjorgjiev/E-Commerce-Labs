@@ -13,15 +13,15 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
-              <Route index element={<h2>Welcome to the Home Page</h2>} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="register" element={<RegisterPage />} />
-              <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN"]} />}>
-                  <Route path="books" element={<BooksPage />} />
-                  <Route path="/books/:id" element={<BookDetailsPage />} />
-                  <Route path="authors" element={<AuthorsPage />} />
-                  <Route path="countries" element={<CountriesPage />} />
-              </Route>
+          <Route index element={<h2>Welcome to the Home Page</h2>} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN", "ADMINISTRATOR"]} />}>
+              <Route path="books" element={<BooksPage />} />
+              <Route path="/books/:id" element={<BookDetailsPage />} />
+              <Route path="authors" element={<AuthorsPage />} />
+              <Route path="countries" element={<CountriesPage />} />
+          </Route>
           </Route>
         </Routes>
       </Router>

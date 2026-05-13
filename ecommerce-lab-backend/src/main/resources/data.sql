@@ -34,5 +34,5 @@ VALUES ('The Lord of the Rings', 'FANTASY', 1, 'GOOD', 5),
        ('Makedonska Krvava Svadba', 'DRAMA', 8, 'GOOD', 3);
 
 INSERT INTO shop_users (username, password, role)
-VALUES ('admin', '$2b$05$DVeOpa2XZ4ikaPZlPUHNMuSSg8FdgQEm7uFmpAkv5/9aESg7mLhSW', 'ROLE_ADMIN'),
+VALUES ('admin', '$2b$10$h07O7UDDifrGLghQElsWMuRrgOsZWySWgIm.KbmT840u.ZMzHHJiy', 'ROLE_ADMIN'),
        ('user', '$2b$05$3tcOcilR8bynPDyfIrc0E.VGpnbGxoe2bUCASs7LluTA87bWrCmka', 'ROLE_USER');

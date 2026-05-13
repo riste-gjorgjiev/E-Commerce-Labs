@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCountries } from '../hooks/useCountries';
 import { useAuth } from '../hooks/useAuth';
 import { EntityDialog } from '../components/EntityDialog';
+import { isAdminRole } from '../utils/roles';
 import {
     Table,
     TableBody,
@@ -22,7 +23,7 @@ import type { CountryPayload } from '../types';
 const CountriesPage: React.FC = () => {
     const { countries, loading, error, createCountry, updateCountry, deleteCountry } = useCountries();
     const { role } = useAuth();
-    const isAdmin = role === 'ROLE_ADMIN';
+    const isAdmin = isAdminRole(role);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formState, setFormState] = useState<CountryPayload>({

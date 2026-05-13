@@ -2,7 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useBooks } from '../hooks/useBooks';
 import { useAuthors } from '../hooks/useAuthors';
 import { useAuth } from '../hooks/useAuth';
+import { useViewPreference } from '../hooks/useViewPreference';
 import { EntityDialog } from '../components/EntityDialog';
+import { isAdminRole } from '../utils/roles';
 import {
     Grid,
     Card,
@@ -14,15 +16,18 @@ import {
     Button,
     TextField,
     MenuItem,
-    Chip
+    Chip,
+    ToggleButton,
+    ToggleButtonGroup
 } from '@mui/material';
 import type { BookPayload } from '../types';
 
 const BooksPage: React.FC = () => {
     const { books, loading, error, createBook, updateBook, deleteBook } = useBooks();
     const { authors } = useAuthors();
-    const { role } = useAuth();
-    const isAdmin = role === 'ROLE_ADMIN';
+    const { role, username } = useAuth();
+    const isAdmin = isAdminRole(role);
+    const { viewMode, setViewMode, loading: viewModeLoading } = useViewPreference(username, 'books');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formState, setFormState] = useState<BookPayload>({
@@ -80,42 +85,84 @@ const BooksPage: React.FC = () => {
         await deleteBook(bookId);
     };
 
-    if (loading) return <Box sx={{display: 'flex', justifyContent: 'center'}}><CircularProgress/></Box>;
+    if (loading || viewModeLoading) return <Box sx={{display: 'flex', justifyContent: 'center'}}><CircularProgress/></Box>;
     if (error) return <Typography color="error">{error}</Typography>;
 
     return (
         <div>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} sx={{ mb: 3 }} spacing={2}>
                 <Typography variant="h4">Books</Typography>
-                {isAdmin && (
-                    <Button variant="contained" onClick={openCreateDialog} disabled={!authors.length}>Add Book</Button>
-                )}
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: 'space-between', sm: 'flex-end' }}>
+                    <ToggleButtonGroup
+                        value={viewMode}
+                        exclusive
+                        onChange={(_, value) => value && setViewMode(value)}
+                        size="small"
+                        color="primary"
+                    >
+                        <ToggleButton value="grid">Grid</ToggleButton>
+                        <ToggleButton value="column">Column</ToggleButton>
+                    </ToggleButtonGroup>
+                    {isAdmin && (
+                        <Button variant="contained" onClick={openCreateDialog} disabled={!authors.length}>Add Book</Button>
+                    )}
+                </Stack>
             </Stack>
-            <Grid container spacing={3}>
-                {books.map((book) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={book.id}>
-                        <Card variant="outlined">
-                            <CardContent>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                                    <Typography variant="h6">{book.name}</Typography>
-                                    <Chip size="small" label={book.state} color={book.state === 'GOOD' ? 'success' : 'default'} />
-                                </Stack>
-                                <Typography color="textSecondary">Category: {book.bookCategory}</Typography>
-                                <Typography variant="body2">
-                                    Author: {book.authorDto?.name} {book.authorDto?.surname}
-                                </Typography>
-                                <Typography variant="body2">Available Copies: {book.availableCopies}</Typography>
-                                {isAdmin && (
-                                    <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                                        <Button size="small" variant="outlined" onClick={() => openEditDialog(book.id)}>Edit</Button>
-                                        <Button size="small" color="error" variant="outlined" onClick={() => handleDelete(book.id)}>Delete</Button>
+            {viewMode === 'grid' ? (
+                <Grid container spacing={3}>
+                    {books.map((book) => (
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={book.id}>
+                            <Card variant="outlined">
+                                <CardContent>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                                        <Typography variant="h6">{book.name}</Typography>
+                                        <Chip size="small" label={book.state} color={book.state === 'GOOD' ? 'success' : 'default'} />
                                     </Stack>
-                                )}
+                                    <Typography color="textSecondary">Category: {book.bookCategory}</Typography>
+                                    <Typography variant="body2">
+                                        Author: {book.authorDto?.name} {book.authorDto?.surname}
+                                    </Typography>
+                                    <Typography variant="body2">Available Copies: {book.availableCopies}</Typography>
+                                    {isAdmin && (
+                                        <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                                            <Button size="small" variant="outlined" onClick={() => openEditDialog(book.id)}>Edit</Button>
+                                            <Button size="small" color="error" variant="outlined" onClick={() => handleDelete(book.id)}>Delete</Button>
+                                        </Stack>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+            ) : (
+                <Stack spacing={2}>
+                    {books.map((book) => (
+                        <Card key={book.id} variant="outlined">
+                            <CardContent>
+                                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2}>
+                                    <Box>
+                                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                            <Typography variant="h6">{book.name}</Typography>
+                                            <Chip size="small" label={book.state} color={book.state === 'GOOD' ? 'success' : 'default'} />
+                                        </Stack>
+                                        <Typography color="textSecondary">Category: {book.bookCategory}</Typography>
+                                        <Typography variant="body2">
+                                            Author: {book.authorDto?.name} {book.authorDto?.surname}
+                                        </Typography>
+                                        <Typography variant="body2">Available Copies: {book.availableCopies}</Typography>
+                                    </Box>
+                                    {isAdmin && (
+                                        <Stack direction="row" spacing={1}>
+                                            <Button size="small" variant="outlined" onClick={() => openEditDialog(book.id)}>Edit</Button>
+                                            <Button size="small" color="error" variant="outlined" onClick={() => handleDelete(book.id)}>Delete</Button>
+                                        </Stack>
+                                    )}
+                                </Stack>
                             </CardContent>
                         </Card>
-                    </Grid>
-                ))}
-            </Grid>
+                    ))}
+                </Stack>
+            )}
             <EntityDialog
                 open={dialogOpen}
                 title={editingId !== null ? 'Edit Book' : 'Add Book'}

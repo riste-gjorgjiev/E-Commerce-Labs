@@ -52,3 +52,9 @@ export interface CountryPayload {
     name: string;
     continent: string;
 }
+
+export type ViewMode = 'grid' | 'column';
+
+export interface UserPreference {
+    booksViewMode: ViewMode;
+}

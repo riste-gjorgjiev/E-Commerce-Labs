@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Card, CardContent } from '@mui/material';
 import type { Book } from '../types';
-import axiosInstance from '../api/axiosInstance';
+import { BookRepository } from '../repository/BookRepository';
 
 export default function BookDetailsPage() {
     const { id } = useParams<{ id: string }>();
@@ -10,13 +10,15 @@ export default function BookDetailsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axiosInstance.get(`/books/${id}`)
-            .then(response => {
-                setBook(response.data);
+        if (!id) return;
+        setLoading(true);
+        BookRepository.getById(Number(id))
+            .then((response) => {
+                setBook(response);
                 setLoading(false);
             })
-            .catch(error => {
-                console.error("Error fetching book details", error);
+            .catch((error) => {
+                console.error('Error fetching book details', error);
                 setLoading(false);
             });
     }, [id]);

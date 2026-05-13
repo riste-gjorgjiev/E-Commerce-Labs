@@ -1,11 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-
-const normalizeRole = (role?: string | null) => {
-    if (!role) return null;
-    return role.replace('ROLE_', '').toUpperCase();
-};
+import { normalizeRole } from '../utils/roles';
 
 type ProtectedRouteProps = {
     allowedRoles?: string[];
