@@ -37,6 +37,7 @@ public class BookController {
     }
 
     @PostMapping("/add")
+    @PostMapping("/add")
     @Operation(summary = "Add a new book")
     public ResponseEntity<DisplayBookDto> create(@Valid @RequestBody CreateBookDto dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(bookApplicationService.create(dto));

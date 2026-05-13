@@ -26,3 +26,11 @@ CREATE TABLE IF NOT EXISTS books (
     state            VARCHAR(10)  NOT NULL,
     available_copies INTEGER      NOT NULL CHECK (available_copies >= 0)
     );
+
+-- Users table
+CREATE TABLE IF NOT EXISTS shop_users (
+                                         id       BIGSERIAL PRIMARY KEY,
+                                         username VARCHAR(150) NOT NULL UNIQUE,
+                                         password VARCHAR(255) NOT NULL,
+                                         role     VARCHAR(50)  NOT NULL
+    );

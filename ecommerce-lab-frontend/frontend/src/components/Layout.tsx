@@ -1,8 +1,17 @@
 import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Container, Box, Stack } from '@mui/material';
+import { useAuth } from '../hooks/useAuth';
 
 export const Layout: React.FC = () => {
+    const { isAuthenticated, role, username, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <AppBar position="static">
@@ -10,10 +19,28 @@ export const Layout: React.FC = () => {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Library E-Shop
                     </Typography>
-                    <Button color="inherit" component={Link} to="/">Home</Button>
-                    <Button color="inherit" component={Link} to="/books">Books</Button>
-                    <Button color="inherit" component={Link} to="/authors">Authors</Button>
-                    <Button color="inherit" component={Link} to="/countries">Countries</Button>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <Button color="inherit" component={Link} to="/">Home</Button>
+                        {isAuthenticated && (
+                            <>
+                                <Button color="inherit" component={Link} to="/books">Books</Button>
+                                <Button color="inherit" component={Link} to="/authors">Authors</Button>
+                                <Button color="inherit" component={Link} to="/countries">Countries</Button>
+                            </>
+                        )}
+                        {!isAuthenticated && (
+                            <>
+                                <Button color="inherit" component={Link} to="/login">Login</Button>
+                                <Button color="inherit" component={Link} to="/register">Register</Button>
+                            </>
+                        )}
+                        {isAuthenticated && (
+                            <>
+                                <Typography variant="body2" sx={{ ml: 1 }}>{username} ({role?.replace('ROLE_', '')})</Typography>
+                                <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                            </>
+                        )}
+                    </Stack>
                 </Toolbar>
             </AppBar>
 

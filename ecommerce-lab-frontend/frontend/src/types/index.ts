@@ -17,3 +17,38 @@ export interface Book {
     state: string;
     availableCopies: number;
 }
+
+export interface AuthResponse {
+    token: string;
+    role: string;
+    username: string;
+}
+
+export interface LoginPayload {
+    username: string;
+    password: string;
+}
+
+export interface RegisterPayload {
+    username: string;
+    password: string;
+}
+
+export interface BookPayload {
+    name: string;
+    bookCategory: string;
+    authorId: number;
+    bookState: string;
+    copies: number;
+}
+
+export interface AuthorPayload {
+    name: string;
+    surname: string;
+    countryId: number;
+}
+
+export interface CountryPayload {
+    name: string;
+    continent: string;
+}

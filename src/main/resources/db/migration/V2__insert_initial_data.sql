@@ -32,3 +32,8 @@ VALUES ('The Lord of the Rings', 'FANTASY', 1, 'GOOD', 5),
        ('The Shining', 'THRILLER', 7, 'GOOD', 5),
        ('It', 'THRILLER', 7, 'BAD', 0),
        ('Makedonska Krvava Svadba', 'DRAMA', 8, 'GOOD', 3);
+
+-- Users
+INSERT INTO shop_users (username, password, role)
+VALUES ('admin', '$2b$05$DVeOpa2XZ4ikaPZlPUHNMuSSg8FdgQEm7uFmpAkv5/9aESg7mLhSW', 'ROLE_ADMIN'),
+       ('user', '$2b$05$3tcOcilR8bynPDyfIrc0E.VGpnbGxoe2bUCASs7LluTA87bWrCmka', 'ROLE_USER');
